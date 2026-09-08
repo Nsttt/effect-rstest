@@ -5,13 +5,13 @@
   "type": "module",
   "license": "MIT",
   "author": "Néstor López",
-  "homepage": "https://github.com/nsttt/effect-rstest#readme",
+  "homepage": "https://github.com/Nsttt/effect-rstest#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nsttt/effect-rstest.git"
+    "url": "https://github.com/Nsttt/effect-rstest"
   },
   "bugs": {
-    "url": "https://github.com/nsttt/effect-rstest/issues"
+    "url": "https://github.com/Nsttt/effect-rstest/issues"
   },
   "keywords": [
     "effect",
