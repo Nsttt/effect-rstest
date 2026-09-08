@@ -2,8 +2,6 @@
 
 Effect test helpers for [Rstest](https://rstest.rs). This package re-exports `@rstest/core` and adds Effect-aware tests, shared layers, test services, and property testing.
 
-This is an unofficial package adapted from [`@effect/vitest`](https://www.npmjs.com/package/@effect/vitest). There is an [open request](https://github.com/Effect-TS/effect/issues/8128) to add an official `@effect/rstest` package upstream.
-
 ## Installation
 
 ```sh
