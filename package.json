@@ -1,0 +1,62 @@
+{
+  "name": "effect-rstest",
+  "version": "0.1.0",
+  "description": "Effect test helpers for Rstest",
+  "type": "module",
+  "license": "MIT",
+  "author": "Néstor López",
+  "homepage": "https://github.com/nsttt/effect-rstest#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nsttt/effect-rstest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nsttt/effect-rstest/issues"
+  },
+  "keywords": [
+    "effect",
+    "rstest",
+    "testing",
+    "typescript"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "packageManager": "pnpm@11.20.0",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js",
+    "./internal/*": null,
+    "./index": null,
+    "./*/index": null
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.ts.map"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.test.json",
+    "test": "rstest run",
+    "test:types": "tstyche --target '>=5.9'",
+    "prepack": "pnpm build"
+  },
+  "peerDependencies": {
+    "@rstest/core": ">=0.11.12 <0.12.0",
+    "effect": ">=4.0.0-rc.112 <5.0.0"
+  },
+  "devDependencies": {
+    "@rstest/core": "0.11.12",
+    "@types/node": "^26.4.1",
+    "effect": "4.0.0-rc.112",
+    "tstyche": "^7.2.4",
+    "typescript": "^5.9.3"
+  }
+}
