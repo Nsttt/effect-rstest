@@ -28,7 +28,13 @@ it.effect("advances virtual time", () =>
   }))
 ```
 
+The test fiber receives Rstest's abort signal. If a test times out, the runner still reports the timeout, but an `onTestFinished` barrier waits for fiber settlement and scoped finalizers before later sequential tests and suite-layer release. The barrier does not impose a second cleanup timeout: a finalizer that never completes can prevent the suite from progressing. Successful non-void Effect values are discarded; ordinary failures and `.fails` outcomes retain their runner semantics.
+
+**Native hook boundary:** Rstest runs native `afterEach` hooks before `onTestFinished`. On timeout, those hooks can run before Effect cleanup finishes; the settlement guarantee does not cover them. It also does not serialize tests explicitly scheduled concurrently.
+
 Use `layer` or `it.layer` to share a layer across a group of tests. Named layers accept `concurrent` to override the enclosing suite.
+
+Rstest's suite hook context has no abort signal. When setup exceeds an explicit layer `timeout`, or the inherited `hookTimeout` when omitted, suite teardown interrupts and awaits the setup fiber before closing its scope. This also releases resources acquired before an early setup failure. The teardown hook retains the same timeout: cleanup that exceeds it can outlive the hook and is not a bounded-cleanup guarantee. Hook failures remain runner failures. Named and unnamed layer blocks use the same lifecycle boundary.
 
 ```ts
 import { Context, Effect, Layer } from "effect"
@@ -60,9 +66,11 @@ it.effect.prop(
 )
 ```
 
+All three helpers accept both tuple and record inputs, mixing schemas and FastCheck arbitraries. Schemas are converted with `Schema.toArbitrary(schema)(FastCheck)`; FastCheck arbitraries are used directly. For example, a synchronous property can use `[Schema.Literal("schema"), FastCheck.integer()]` or `{ label: Schema.Literal("schema"), count: FastCheck.integer() }`. A schema must support arbitrary generation; this does not make every possible schema generatable.
+
 Rstest modifiers remain available. Use `it.effect.concurrent`, `it.effect.sequential`, `it.effect.skip`, `it.effect.only`, `it.effect.fails`, `it.effect.skipIf`, and `it.effect.runIf` with Effect tests.
 
-Call `addEqualityTesters()` from an Rstest setup file to make `toEqual` use Effect's `Equal` implementation.
+Call `addEqualityTesters()` from an Rstest setup file to opt in. When both compared values implement Effect's `Equal` protocol, the tester delegates to `Equal.equals`, including semantic inequality and nested comparisons. For other values it returns `undefined`, leaving plain-object equality and asymmetric matchers to Rstest. It does not replace Rstest's equality behavior globally.
 
 ## License
 
