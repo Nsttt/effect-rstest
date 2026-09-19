@@ -1,6 +1,6 @@
 {
   "name": "effect-rstest",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Effect test helpers for Rstest",
   "type": "module",
   "license": "MIT",
