@@ -1,6 +1,6 @@
 import { Context, Effect, Layer, Schema } from "effect"
 import { it, layer } from "effect-rstest"
-import { FastCheck } from "effect/testing"
+import { Arbitrary } from "effect/unstable/arbitrary"
 import { describe, expect, test } from "tstyche"
 
 class Foo extends Context.Service<Foo, "foo">()("Foo") {}
@@ -93,7 +93,7 @@ describe("property testing", () => {
         expect(count).type.toBe<number>()
         return Effect.void
       },
-      { fastCheck: { numRuns: 10, seed: 1001 } }
+      { arbitrary: { runs: 10, seed: 1001 } }
     )
   })
 
@@ -109,17 +109,17 @@ describe("property testing", () => {
   test("infers Schema record values for the pure property helper", () => {
     it.prop(
       "schema record",
-      { text: Schema.String, count: Schema.Int },
+      { text: Schema.String, count: Arbitrary.schema(Schema.Int) },
       ({ text, count }) => {
         expect(text).type.toBe<string>()
         expect(count).type.toBe<number>()
       },
-      { fastCheck: { numRuns: 10 } }
+      { arbitrary: { runs: 10 } }
     )
   })
 
   test("infers mixed Schema and Arbitrary values", () => {
-    const text = FastCheck.constantFrom("a" as const, "b" as const)
+    const text = Arbitrary.schema(Schema.Literals(["a", "b"]))
 
     it.effect.prop(
       "mixed tuple",
