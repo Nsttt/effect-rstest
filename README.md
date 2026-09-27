@@ -53,7 +53,7 @@ it.layer(ApiLive)("api", (it) => {
 })
 ```
 
-Property tests accept Effect `Schema` and FastCheck `Arbitrary` values. They shrink callbacks that return `false`, throw, or fail with a non-interruption cause.
+Property tests accept Effect `Schema` values and `Arbitrary` values from `effect/unstable/arbitrary`. They shrink callbacks that return `false`, throw, or fail with a non-interruption cause.
 
 ```ts
 import { Effect, Schema } from "effect"
@@ -66,7 +66,9 @@ it.effect.prop(
 )
 ```
 
-All three helpers accept both tuple and record inputs, mixing schemas and FastCheck arbitraries. Schemas are converted with `Schema.toArbitrary(schema)(FastCheck)`; FastCheck arbitraries are used directly. For example, a synchronous property can use `[Schema.Literal("schema"), FastCheck.integer()]` or `{ label: Schema.Literal("schema"), count: FastCheck.integer() }`. A schema must support arbitrary generation; this does not make every possible schema generatable.
+All three helpers accept tuple and record inputs, mixing schemas and arbitraries. Schemas are converted with `Arbitrary.schema(schema)`; `Arbitrary` values are used directly. For example, a synchronous property can use `[Schema.Literal("schema"), Arbitrary.schema(Schema.Int)]`. A schema must support arbitrary generation. Pass check options as `{ arbitrary: { runs: 200, seed: "repro" } }` (see `Arbitrary.CheckOptions`).
+
+Requires `effect` `4.0.0-rc.113` or later, which removed `effect/testing/FastCheck`. To migrate from 0.1.x, replace `FastCheck.*` inputs with schemas or `Arbitrary` values, and `{ fastCheck: { numRuns } }` with `{ arbitrary: { runs } }`.
 
 Rstest modifiers remain available. Use `it.effect.concurrent`, `it.effect.sequential`, `it.effect.skip`, `it.effect.only`, `it.effect.fails`, `it.effect.skipIf`, and `it.effect.runIf` with Effect tests.
 

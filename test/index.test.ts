@@ -1,7 +1,8 @@
 import { Clock, Context, Duration, Effect, Equal, Fiber, Hash, Layer, Schema } from "effect"
 import { addEqualityTesters, afterAll, assert, describe, expect, it, layer, makeMethods } from "effect-rstest"
 import * as testAssert from "effect-rstest/utils"
-import { FastCheck, TestClock } from "effect/testing"
+import { TestClock } from "effect/testing"
+import { Arbitrary } from "effect/unstable/arbitrary"
 
 it.effect(
   "effect",
@@ -185,7 +186,7 @@ describe("layer", () => {
             expect(foo).toEqual("foo")
             return num === num
           }),
-        { fastCheck: { numRuns: 200 } }
+        { arbitrary: { runs: 200 } }
       )
 
       it.effect.prop(
@@ -197,7 +198,7 @@ describe("layer", () => {
             assert.strictEqual(foo, "foo")
             assert.isTrue(Number.isInteger(value))
           }),
-        { fastCheck: { numRuns: 5, seed: 1001 } }
+        { arbitrary: { runs: 5, seed: 1001 } }
       )
     })
   })
@@ -299,7 +300,7 @@ describe("anonymous parent layer lifetime", () => {
 })
 
 const realNumber = Schema.Finite
-const textArbitrary = FastCheck.constantFrom("a" as const, "b" as const)
+const textArbitrary = Arbitrary.schema(Schema.Literals(["a", "b"]))
 
 it.prop(
   "schema with array",
@@ -317,7 +318,7 @@ it.prop(
   "rejects Promise-returning synchronous properties",
   [Schema.Int],
   (() => Promise.resolve(true)) as unknown as () => boolean,
-  { fails: true, fastCheck: { numRuns: 1 } }
+  { fails: true, arbitrary: { runs: 1 } }
 )
 
 let mixedTupleRuns = 0
@@ -335,7 +336,7 @@ it.prop(
     assert.isTrue(Number.isInteger(count))
     assert.include(["a", "b"], text)
   },
-  { fastCheck: { numRuns: 5, seed: 1002 } }
+  { arbitrary: { runs: 5, seed: 1002 } }
 )
 
 it.effect.prop(
@@ -347,7 +348,7 @@ it.effect.prop(
       assert.isTrue(Number.isInteger(count))
       assert.include(["a", "b"], text)
     }),
-  { fastCheck: { numRuns: 5, seed: 1003 } }
+  { arbitrary: { runs: 5, seed: 1003 } }
 )
 
 it.prop("symmetry", [realNumber, Schema.Int], ([a, b]) => a + b === b + a)
@@ -376,7 +377,7 @@ it.effect.prop(
       assert.strictEqual(typeof text, "string")
       assert.isTrue(Number.isInteger(count))
     }),
-  { fastCheck: { numRuns: 5, seed: 1004 } }
+  { arbitrary: { runs: 5, seed: 1004 } }
 )
 
 it.effect.prop("symmetry", [realNumber, Schema.Int], ([a, b]) =>
@@ -417,6 +418,11 @@ describe("property failures", () => {
     assert.isTrue(timeoutPropertyReleased)
   })
 
+  it.prop("falsifies properties that return false", [Input], () => false, {
+    fails: true,
+    arbitrary: { runs: 1, seed: "assertion-shrink" }
+  })
+
   it.prop(
     "shrinks synchronous defects",
     [Input],
@@ -424,7 +430,7 @@ describe("property failures", () => {
       pureDefectValues.push(value)
       throw new Error("property defect")
     },
-    { fails: true, fastCheck: { numRuns: 1, seed: 1005 } }
+    { fails: true, arbitrary: { runs: 1, seed: "assertion-shrink" } }
   )
 
   it.effect.prop(
@@ -435,7 +441,7 @@ describe("property failures", () => {
         effectDefectValues.push(value)
         assert.strictEqual(value, 0)
       }),
-    { fails: true, fastCheck: { numRuns: 1, seed: 1005 } }
+    { fails: true, arbitrary: { runs: 1, seed: "assertion-shrink" } }
   )
 
   it.effect.prop(
@@ -445,7 +451,7 @@ describe("property failures", () => {
       interruptedRuns++
       return Effect.interrupt
     },
-    { fails: true, fastCheck: { numRuns: 1, seed: 1005 } }
+    { fails: true, arbitrary: { runs: 1, seed: "assertion-shrink" } }
   )
 
   it.effect.prop(
@@ -462,6 +468,6 @@ describe("property failures", () => {
             timeoutPropertyReleased = true
           })
       ),
-    { fails: true, timeout: 10, fastCheck: { numRuns: 1, seed: 1006 } }
+    { fails: true, timeout: 10, arbitrary: { runs: 1, seed: 1006 } }
   )
 })
