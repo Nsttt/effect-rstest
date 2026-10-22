@@ -8,7 +8,7 @@ Effect test helpers for [Rstest](https://rstest.rs). This package re-exports `@r
 pnpm add -D effect-rstest @rstest/core
 ```
 
-The initial release targets Effect 4 RC and Rstest 0.11.
+The package targets Effect 4 RC and Rstest 0.12.
 
 ## Usage
 
