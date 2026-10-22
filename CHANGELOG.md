@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.0 (2026-10-22)
+
+## What's Changed
+* feat!: port property tests to effect/unstable/arbitrary by @BleedingDev in https://github.com/Nsttt/effect-rstest/pull/7
+* fix: support @rstest/core 0.12 by @fi3ework in https://github.com/Nsttt/effect-rstest/pull/8
+
+## New Contributors
+* @fi3ework made their first contribution in https://github.com/Nsttt/effect-rstest/pull/8
+
+**Full Changelog**: https://github.com/Nsttt/effect-rstest/compare/v0.1.5...v1.0.0
+
 ## 0.1.5 (2026-09-19)
 
 ## What's Changed
