@@ -49,12 +49,12 @@
     "prepack": "pnpm build"
   },
   "peerDependencies": {
-    "@rstest/core": ">=0.11.12 <0.12.0",
+    "@rstest/core": ">=0.11.12 <0.13.0",
     "effect": ">=4.0.0-rc.113 <5.0.0"
   },
   "devDependencies": {
     "@rslib/core": "1.0.0",
-    "@rstest/core": "0.11.12",
+    "@rstest/core": "0.12.0",
     "@types/node": "^26.4.1",
     "effect": "4.0.0-rc.117",
     "tstyche": "^7.2.4",
