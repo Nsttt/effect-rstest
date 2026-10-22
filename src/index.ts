@@ -7,7 +7,7 @@ import type * as Effect from "effect/Effect"
 import type * as Layer from "effect/Layer"
 import type * as Schema from "effect/Schema"
 import type * as Scope from "effect/Scope"
-import type { FastCheck as FC } from "effect/testing"
+import type * as Arbitrary from "effect/unstable/arbitrary/Arbitrary"
 import * as internal from "./internal/internal.ts"
 
 /**
@@ -46,11 +46,11 @@ export namespace Rstest {
    * @since 0.1.0
    */
   export type Arbitraries =
-    | ReadonlyArray<Schema.Schema<any> | FC.Arbitrary<any>>
-    | { [K in string]: Schema.Schema<any> | FC.Arbitrary<any> }
+    | ReadonlyArray<Schema.Schema<any> | Arbitrary.Arbitrary<any>>
+    | { [K in string]: Schema.Schema<any> | Arbitrary.Arbitrary<any> }
 
   type ArbitraryValue<A> = A extends Schema.Schema<infer T> ? T
-    : A extends FC.Arbitrary<infer T> ? T
+    : A extends Arbitrary.Arbitrary<infer T> ? T
     : never
 
   /**
@@ -102,7 +102,7 @@ export namespace Rstest {
       timeout?:
         | number
         | R.TestOptions & {
-          fastCheck?: FC.Parameters<any>
+          arbitrary?: Arbitrary.CheckOptions
           fails?: boolean
         }
     ) => void
@@ -156,7 +156,7 @@ export namespace Rstest {
       timeout?:
         | number
         | R.TestOptions & {
-          fastCheck?: FC.Parameters<any>
+          arbitrary?: Arbitrary.CheckOptions
           fails?: boolean
         }
     ) => void

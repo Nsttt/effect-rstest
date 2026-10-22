@@ -1,18 +1,18 @@
 import { it } from "effect-rstest"
 import { Effect, Schema } from "effect"
-import { FastCheck } from "effect/testing"
+import { Arbitrary } from "effect/unstable/arbitrary"
 import { describe, expect, test } from "tstyche"
 
 describe("schema properties", () => {
   test("plain tuple inputs infer schema and arbitrary values", () => {
-    it.prop("tuple", [Schema.Literal("schema"), FastCheck.integer()], ([label, count]) => {
+    it.prop("tuple", [Schema.Literal("schema"), Arbitrary.schema(Schema.Int)], ([label, count]) => {
       expect(label).type.toBe<"schema">()
       expect(count).type.toBe<number>()
     })
   })
 
   test("plain record inputs infer schema and arbitrary values", () => {
-    it.prop("record", { label: Schema.Literal("schema"), count: FastCheck.integer() }, ({ label, count }) => {
+    it.prop("record", { label: Schema.Literal("schema"), count: Arbitrary.schema(Schema.Int) }, ({ label, count }) => {
       expect(label).type.toBe<"schema">()
       expect(count).type.toBe<number>()
     })

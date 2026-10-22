@@ -13,9 +13,10 @@ import { flow, pipe } from "effect/Function"
 import * as Layer from "effect/Layer"
 import * as Predicate from "effect/Predicate"
 import * as Schedule from "effect/Schedule"
-import * as Schema from "effect/Schema"
+import type * as Schema from "effect/Schema"
 import * as Scope from "effect/Scope"
-import { FastCheck as FC, TestClock, TestConsole } from "effect/testing"
+import { TestClock, TestConsole } from "effect/testing"
+import * as Arbitrary from "effect/unstable/arbitrary/Arbitrary"
 import type * as Rstest from "../index.ts"
 
 const runPromise: <E, A>(
@@ -61,7 +62,7 @@ const hookTimeout = (timeout?: Duration.Input) =>
   timeout === undefined ? undefined : Duration.toMillis(Duration.fromInputUnsafe(timeout))
 
 type PropertyOptions = R.TestOptions & {
-  readonly fastCheck?: FC.Parameters<any> | undefined
+  readonly arbitrary?: Arbitrary.CheckOptions | undefined
   readonly fails?: boolean | undefined
 }
 
@@ -75,11 +76,11 @@ const testOptions = (timeout?: number | R.TestOptions | PropertyOptions): R.Test
   if (timeout === undefined) {
     return {}
   }
-  const { fails: _, fastCheck: __, ...options } = timeout as PropertyOptions
+  const { arbitrary: __, fails: _, ...options } = timeout as PropertyOptions
   return options
 }
 
-type ArbitraryInput = Schema.Schema<any> | FC.Arbitrary<unknown>
+type ArbitraryInput = Schema.Schema<any> | Arbitrary.Arbitrary<unknown>
 
 type Arbitraries = ReadonlyArray<ArbitraryInput> | { [K in string]: ArbitraryInput }
 
@@ -87,18 +88,18 @@ const propertyTestOptions = (
   timeout: PropertyTimeout | undefined
 ): Exclude<PropertyTimeout, number> | undefined => typeof timeout === "number" ? undefined : timeout
 
-const checkOptions = (timeout: PropertyTimeout | undefined): FC.Parameters<any> | undefined =>
-  propertyTestOptions(timeout)?.fastCheck
+const checkOptions = (timeout: PropertyTimeout | undefined): Arbitrary.CheckOptions | undefined =>
+  propertyTestOptions(timeout)?.arbitrary
 
-const compileArbitraryInput = (input: ArbitraryInput): FC.Arbitrary<any> =>
-  Schema.isSchema(input) ? Schema.toArbitrary(input)(FC) : input as FC.Arbitrary<any>
+const compileArbitraryInput = (input: ArbitraryInput): Arbitrary.Arbitrary<any> =>
+  Arbitrary.isArbitrary(input) ? input : Arbitrary.schema(input)
 
-const makeArbitrary = (arbitraries: Arbitraries): FC.Arbitrary<any> =>
-  Array.isArray(arbitraries)
-    ? FC.tuple(...arbitraries.map(compileArbitraryInput))
-    : FC.record(Object.fromEntries(
-      Object.entries(arbitraries).map(([key, input]) => [key, compileArbitraryInput(input)])
-    ))
+const makeArbitrary = (arbitraries: Arbitraries): Arbitrary.Arbitrary<any> =>
+  Arbitrary.all(
+    Array.isArray(arbitraries)
+      ? arbitraries.map(compileArbitraryInput)
+      : Object.fromEntries(Object.entries(arbitraries).map(([key, input]) => [key, compileArbitraryInput(input)]))
+  )
 
 const normalizeProperty = <A, E, R>(
   property: (value: A) => boolean | Effect.Effect<boolean, E, R>,
@@ -130,13 +131,18 @@ const normalizeSyncProperty = <A>(
 
 const runCheck = <A, E>(
   ctx: R.TestContext,
-  arbitrary: FC.Arbitrary<A>,
+  arbitrary: Arbitrary.Arbitrary<A>,
   property: (value: A) => boolean | Effect.Effect<boolean, E>,
-  options: FC.Parameters<any> | undefined
+  options: Arbitrary.CheckOptions | undefined
 ): Promise<void> =>
-  FC.assert(
-    FC.asyncProperty(arbitrary, (value) => runTest(ctx)(normalizeProperty(property, value))),
-    options
+  runTest(ctx)(
+    Effect.flatMapEager(
+      Arbitrary.checkEffect(arbitrary, (value) => normalizeProperty(property, value), options),
+      (result) => {
+        const failure = Arbitrary.formatCheckFailure(result)
+        return failure === undefined ? Effect.void : Effect.die(new Error(failure))
+      }
+    )
   )
 
 type TestAPI = R.TestAPIs | R.TestAPIs["skip"]
