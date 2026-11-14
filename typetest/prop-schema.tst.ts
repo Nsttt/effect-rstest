@@ -1,6 +1,6 @@
 import { it } from "effect-rstest"
 import { Effect, Schema } from "effect"
-import { Arbitrary } from "effect/unstable/arbitrary"
+import { Arbitrary } from "effect"
 import { describe, expect, test } from "tstyche"
 
 describe("schema properties", () => {

@@ -1,6 +1,6 @@
 import { Context, Effect, Layer, Schema } from "effect"
 import { it, layer } from "effect-rstest"
-import { Arbitrary } from "effect/unstable/arbitrary"
+import { Arbitrary } from "effect"
 import { describe, expect, test } from "tstyche"
 
 class Foo extends Context.Service<Foo, "foo">()("Foo") {}

@@ -16,7 +16,7 @@ import * as Schedule from "effect/Schedule"
 import type * as Schema from "effect/Schema"
 import * as Scope from "effect/Scope"
 import { TestClock, TestConsole } from "effect/testing"
-import * as Arbitrary from "effect/unstable/arbitrary/Arbitrary"
+import { Arbitrary } from "effect"
 import type * as Rstest from "../index.ts"
 
 const runPromise: <E, A>(

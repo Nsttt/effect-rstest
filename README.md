@@ -8,7 +8,7 @@ Effect test helpers for [Rstest](https://rstest.rs). This package re-exports `@r
 pnpm add -D effect-rstest @rstest/core
 ```
 
-The package targets Effect 4 RC and Rstest 0.12.
+The package targets stable Effect 4.0.7 or later and Rstest 0.12.
 
 ## Usage
 
@@ -53,7 +53,7 @@ it.layer(ApiLive)("api", (it) => {
 })
 ```
 
-Property tests accept Effect `Schema` values and `Arbitrary` values from `effect/unstable/arbitrary`. They shrink callbacks that return `false`, throw, or fail with a non-interruption cause.
+Property tests accept Effect `Schema` values and `Arbitrary` values from the `effect` root export. They shrink callbacks that return `false`, throw, or fail with a non-interruption cause.
 
 ```ts
 import { Effect, Schema } from "effect"
@@ -68,7 +68,7 @@ it.effect.prop(
 
 All three helpers accept tuple and record inputs, mixing schemas and arbitraries. Schemas are converted with `Arbitrary.schema(schema)`; `Arbitrary` values are used directly. For example, a synchronous property can use `[Schema.Literal("schema"), Arbitrary.schema(Schema.Int)]`. A schema must support arbitrary generation. Pass check options as `{ arbitrary: { runs: 200, seed: "repro" } }` (see `Arbitrary.CheckOptions`).
 
-Requires `effect` `4.0.0-rc.113` or later, which removed `effect/testing/FastCheck`. To migrate from 0.1.x, replace `FastCheck.*` inputs with schemas or `Arbitrary` values, and `{ fastCheck: { numRuns } }` with `{ arbitrary: { runs } }`.
+Requires stable `effect` `4.0.7` or later. `effect/testing/FastCheck` is no longer exported. To migrate from 0.1.x, replace `FastCheck.*` inputs with schemas or `Arbitrary` values, and `{ fastCheck: { numRuns } }` with `{ arbitrary: { runs } }`.
 
 Rstest modifiers remain available. Use `it.effect.concurrent`, `it.effect.sequential`, `it.effect.skip`, `it.effect.only`, `it.effect.fails`, `it.effect.skipIf`, and `it.effect.runIf` with Effect tests.
 
